@@ -1,0 +1,9 @@
+numpy
+pandas
+beautifulsoup4
+pydantic
+selenium
+supabase
+psycopg2-binary
+python-dotenv
+streamlit
