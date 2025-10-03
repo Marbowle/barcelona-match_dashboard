@@ -10,3 +10,22 @@ def get_players():
     finally:
         conn.close()
 
+
+def get_teams():
+    conn = get_connection()
+    try:
+        query = "SELECT team_id, name, manager_name, country_name  FROM teams ORDER BY name"
+
+        df = pd.read_sql(query, conn)
+        return df
+    finally:
+        conn.close()
+
+def get_match_id(a: int, b: int):
+    conn = get_connection()
+    try:
+        query = "SELECT match_id FROM match_events WHERE team_id IN (%s,%s) GROUP BY match_id HAVING COUNT(DISTINCT team_id) = 2 ORDER BY match_id DESC"
+        df = pd.read_sql(query, conn, params=(int(a), int(b)))
+        return df
+    finally:
+        conn.close()
