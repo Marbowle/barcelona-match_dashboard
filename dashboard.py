@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 import queries
+from mplsoccer import Pitch, VerticalPitch
 
 st.title("Match Dashboard")
 st.header("Match Statistics")
@@ -42,7 +43,7 @@ compare_team_id = int(teams_df.loc[teams_df['name'] == compare_team, "team_id"].
 df = queries.get_match_id(barcelona_id, compare_team_id)
 match_id = st.selectbox('Select a match', df['match_id'].astype(int).tolist(), index=None, placeholder="Choose a match")
 if match_id is None:
-    st.info("Choose your match id to see a statistic")
+    st.info("Choose your match id to see a list of players")
     st.stop()
 
 barcelona_players = queries.get_players(int(match_id), int(barcelona_id))
@@ -57,19 +58,52 @@ with col2:
 #eventy dla danego teamu + dodanie eventów dla danego piłkarza z drużyny
 match_df = queries.get_match_events(match_id)
 
-barcelona_team = match_df[match_df['team_id'] == barcelona_id]
-compare_team = match_df[match_df['team_id'] == compare_team_id]
+#otrzymywanie id piłkarza po wywołaniu
+def get_player_id(players_df, player):
+    s = players_df.loc[players_df['name'] == player, "player_id"]
+    return s
+
+barcelona_player_id = int(get_player_id(barcelona_players, barcelona_player))
+compare_team_player_id = int(get_player_id(compare_team_players, compare_team_player))
 
 #zwracanie przefiltrowanego df, ze wzgledu na piłkarza i mecz
+def filter_data(df, team, player):
+    if team:
+        df = df[df['team_id'] == team]
+    if player:
+        df = df[df['player_id'] == player]
+    return df
 
-#funkcja do wyświetlania podań danego piłkarza
-#def creat_pass_map_players(match_df,team_id, player_id):
- #   match_df = match_df[match_df['type_display_name'] == 'Pass']
+#przefiltrowane df ze wzgledu na piłkarza i team
+barcelona_df = filter_data(match_df, barcelona_id, barcelona_player_id)
+compare_team_df = filter_data(match_df, compare_team_id, compare_team_player_id)
 
+#stowrzenie funkcji rysującej boisko
+def get_pitch():
+    return VerticalPitch(pitch_type='statsbomb', half=True)
 
-#funkcja do wyświetlania shot map
-#def create_shot(match_df,team_id):
- #   match_df = match_df[match_df['type_display_name'] == 'Goal'].reset_index(drop=True)
-  #  match_df = match_df[match_df['team_id'] == team_id]
+#tworzenie shot_mapy, dla piłkarza
+def create_shotmap(df, title: str):
+    pitch = get_pitch()
+    fig, ax = pitch.draw()
+
+    df_shots = df.copy()
+    shots = df_shots[df_shots['is_shot'] == 'true']
+    goals = shots[shots['is_goal'] == 'true']
+    others = goals[goals['is_goal'] == 'false']
+
+    ax.scatter(others['x'], others['y'], s=60, c='red')
+    ax.scatter(goals['x'], goals['y'], s=90, c='green')
+
+    ax.set_title(title, fontsize=10, pad = 10)
+    return fig
+
+col1, col2 = st.columns(2)
+with col1:
+    fig_home = create_shotmap(barcelona_df, "Barcelona shots by player")
+    st.pyplot(fig_home,use_container_width=True)
+with col2:
+    fig_compare_team = create_shotmap(compare_team_df, "Compared team shots by player")
+    st.pyplot(fig_compare_team,use_container_width=True)
 
 
