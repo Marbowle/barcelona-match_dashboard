@@ -20,7 +20,6 @@ with col2:
     other_team = [t for t in teams_df['name'] if t!=base_team]
     compare_team = st.selectbox('Select a comparison team', other_team)
 
-
 barcelona_filename = base_team.lower() + "_logo.png"
 barcelona_logo_path = f"team_logos/{barcelona_filename}"
 
@@ -39,16 +38,38 @@ with col2:
 barcelona_id = int(teams_df.loc[teams_df['name'] == base_team, "team_id"].iloc[0])
 compare_team_id = int(teams_df.loc[teams_df['name'] == compare_team, "team_id"].iloc[0])
 
+#tutaj zabezpieczenie do tego, jeżeli nie mamy wybranego żadnego id meczu
 df = queries.get_match_id(barcelona_id, compare_team_id)
-match_id = st.selectbox('Select a match', df['match_id'].unique())
+match_id = st.selectbox('Select a match', df['match_id'].astype(int).tolist(), index=None, placeholder="Choose a match")
+if match_id is None:
+    st.info("Choose your match id to see a statistic")
+    st.stop()
+
+barcelona_players = queries.get_players(int(match_id), int(barcelona_id))
+compare_team_players = queries.get_players(int(match_id), int(compare_team_id))
+
+col1, col2 = st.columns(2)
+with col1:
+    barcelona_player = st.selectbox("Select a player", barcelona_players, index=None)
+with col2:
+    compare_team_player = st.selectbox("Select a player", compare_team_players, index=None)
+
+#eventy dla danego teamu + dodanie eventów dla danego piłkarza z drużyny
+match_df = queries.get_match_events(match_id)
+
+barcelona_team = match_df[match_df['team_id'] == barcelona_id]
+compare_team = match_df[match_df['team_id'] == compare_team_id]
+
+#zwracanie przefiltrowanego df, ze wzgledu na piłkarza i mecz
+
+#funkcja do wyświetlania podań danego piłkarza
+#def creat_pass_map_players(match_df,team_id, player_id):
+ #   match_df = match_df[match_df['type_display_name'] == 'Pass']
 
 
-def creat_pass_network(match_df,team_id):
-    match_df = match_df[match_df['type_display_name'] == 'Pass']
-
-
-def create_shot(match_df,team_id):
-    match_df = match_df[match_df['type_display_name'] == 'Goal'].reset_index(drop=True)
-    match_df = match_df[match_df['team_id'] == team_id]
+#funkcja do wyświetlania shot map
+#def create_shot(match_df,team_id):
+ #   match_df = match_df[match_df['type_display_name'] == 'Goal'].reset_index(drop=True)
+  #  match_df = match_df[match_df['team_id'] == team_id]
 
 
