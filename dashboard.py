@@ -124,6 +124,9 @@ def create_shotmap(df, title: str):
     goal_mask = is_goal_bool | type_str.eq('goal')
 
     shots = df.loc[shot_mask].dropna(subset=['x', 'y'])
+    
+    if shots.empty:
+        return None
 
     goals = df.loc[shot_mask & goal_mask]
     others = df.loc[shot_mask & ~goal_mask]
