@@ -11,6 +11,18 @@ st.title("Match Dashboard")
 st.header("Match Statistics")
 st.caption("Here you will see the match statistics between Barcelona and a team of your choice. The statistics are from the last 2024/2025 season.")
 
+import streamlit as st, os
+def _g(k):
+    return bool(st.secrets.get(k) or os.getenv(k))
+
+st.write({
+  "SUPABASE_HOST": _g("SUPABASE_HOST"),
+  "SUPABASE_DB": _g("SUPABASE_DB"),
+  "SUPABASE_USER": _g("SUPABASE_USER"),
+  "SUPABASE_PASSWORD": _g("SUPABASE_PASSWORD"),
+  "SUPABASE_PORT": _g("SUPABASE_PORT"),
+})
+
 teams_df = queries.get_teams()
 
 col1, col2 = st.columns(2)

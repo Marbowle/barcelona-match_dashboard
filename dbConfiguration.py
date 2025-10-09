@@ -24,7 +24,7 @@ def get_connection():
         'host':  _get("SUPABASE_HOST"),
         'database': _get("SUPABASE_DB"),
         'user': _get("SUPABASE_USER"),
-        'password': _get("DB_PASSWORD"),
+        'password': _get("SUPABASE_PASSWORD"),
         'port': _get("SUPABASE_PORT")
     }
     return psycopg2.connect(**cfg)
