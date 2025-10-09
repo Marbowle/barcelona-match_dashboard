@@ -9,7 +9,7 @@ from mplsoccer import Pitch
 
 st.title("Match Dashboard")
 st.header("Match Statistics")
-st.caption("Here you will see match statistic between 2 teams Barcelona and your choice. The statistics are from last season 2024/2025")
+st.caption("Here you will see the match statistics between Barcelona and a team of your choice. The statistics are from the last 2024/2025 season.")
 
 teams_df = queries.get_teams()
 
@@ -43,7 +43,7 @@ compare_team_id = int(teams_df.loc[teams_df['name'] == compare_team, "team_id"].
 df = queries.get_match_id(barcelona_id, compare_team_id)
 match_id = st.selectbox('Select a match', df['match_id'].astype(int).tolist(), index=None, placeholder="Choose a match")
 if match_id is None:
-    st.info("Choose your match id to see a list of players")
+    st.info("Choose your match ID to see the list of players")
     st.stop()
 
 barcelona_players = queries.get_players(int(match_id), int(barcelona_id))
@@ -65,7 +65,7 @@ col1, col2 = st.columns(2)
 with col1:
     barcelona_player = st.selectbox("Select a Barcelona player", barca_names, index=None, placeholder="Choose a Barcelona player", key="barca_player_name")
 with col2:
-    compare_team_player = st.selectbox("Select a opponent player", opp_names, index=None, placeholder="Choose a opponent player", key="opp_player_name")
+    compare_team_player = st.selectbox("Select an opposing player", opp_names, index=None, placeholder="Choose a opponent player", key="opp_player_name")
 
 #zabezpieczenie przed wyborem zawodnika
 if barcelona_player is None  or compare_team_player is None:
@@ -124,7 +124,7 @@ def create_shotmap(df, title: str):
     goal_mask = is_goal_bool | type_str.eq('goal')
 
     shots = df.loc[shot_mask].dropna(subset=['x', 'y'])
-    
+
     if shots.empty:
         return None
 
