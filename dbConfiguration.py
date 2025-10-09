@@ -15,15 +15,19 @@ else:
 
 load_dotenv(dotenv_path)
 
+def _get(name, default=None):
+    return st.secrets.get(name) or os.getenv(name)
+
 
 def get_connection():
-    return psycopg2.connect(
-        host=os.getenv("SUPABASE_HOST"),
-        database=os.getenv("SUPABASE_DB"),
-        user=os.getenv("SUPABASE_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        port=os.getenv("SUPABASE_PORT")
-    )
+    cfg = {
+        'host':  _get("SUPABASE_HOST"),
+        'database': _get("SUPABASE_DB"),
+        'user': _get("SUPABASE_USER"),
+        'password': _get("DB_PASSWORD"),
+        'port': _get("SUPABASE_PORT")
+    }
+    return psycopg2.connect(**cfg)
 
 def get_supabase_client():
     url = os.getenv("SUPABASE_URL")
